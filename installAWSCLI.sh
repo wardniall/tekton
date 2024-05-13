@@ -54,3 +54,6 @@ echo "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
 
 echo "[default]" >> ~/.aws/config
 echo "region = eu-north-1" >> ~/.aws/config
+
+aws ec2 describe-instances
+
