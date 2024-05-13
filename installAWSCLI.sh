@@ -44,6 +44,8 @@ done
 if [ -e ~/.aws ]; then
   rm -rf ~/.aws
   mkdir ~/.aws
+else
+  mkdir ~/.aws
 fi
 
 echo "[default]" >> ~/.aws/credentials
