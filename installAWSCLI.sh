@@ -55,5 +55,20 @@ echo "aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" >> ~/.aws/credentials
 echo "[default]" >> ~/.aws/config
 echo "region = eu-north-1" >> ~/.aws/config
 
+# install aws cli
+
+apt update
+apt install curl -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+apt install unzip -y
+unzip awscliv2.zip
+./aws/install
+apt install groff less -y
+
+# list vms
+aws ec2 describe-instances
+
+
+
 aws ec2 describe-instances
 
