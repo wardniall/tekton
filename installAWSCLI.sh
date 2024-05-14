@@ -133,11 +133,12 @@ aws ec2 run-instances \
   PUBLIC_DNS=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[].Instances[].PublicDnsName' | jq -e -r ".[]")
 
   #sleep for 20 secs, looks like it takes a while for the security group rule to activate
+  echo "sleeping for 20 secs"
   sleep 20
 
-  scp -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:/
+  scp  -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:/
 
-  ssh -i NW_KeyPair.pem admin@${PUBLIC_DNS} '/testscript.sh'
+  ssh -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem admin@${PUBLIC_DNS} '/testscript.sh'
 
 
 
