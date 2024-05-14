@@ -99,8 +99,22 @@ aws ec2 create-security-group \
 
 SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter="Name=group-name,Values=nw-sg" | jq -e -r ".SecurityGroups[0].GroupId")
 
+# create an ingress rule for ssh access
+aws ec2 authorize-security-group-ingress \
+    --group-id ${SECURITY_GROUP_ID} \
+    --protocol tcp \
+    --port 22 \
+    --cidr 0.0.0.0/0
+
 # launch the instance
-aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type t3.micro --key-name NW_Pair --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID}
+aws ec2 run-instances \
+  --image-id ${AMI_ID} \
+  --count 1 \
+  --instance-type t3.micro \
+  --key-name NW_Pair \
+  --security-group-ids ${SECURITY_GROUP_ID} \
+  --subnet-id ${SUBNET_ID} \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=test01}]'
 
 
 
