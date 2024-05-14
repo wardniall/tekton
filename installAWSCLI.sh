@@ -122,6 +122,9 @@ aws ec2 run-instances \
   echo "echo $(hostname)" >> testscript.sh
   chmod 755 testscript.sh
 
+  # install scp
+  apt-get install openssh-client -y
+
   scp -i NW_KeyPair.pem -r ./testscript.sh admin@tektontest.eu-north-1.compute.amazonaws.com:/
 
   ssh -i NW_KeyPair.pem admin@tektontest.eu-north-1.compute.amazonaws.com '/testscript.sh'
