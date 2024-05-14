@@ -116,6 +116,16 @@ aws ec2 run-instances \
   --subnet-id ${SUBNET_ID} \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=tektontest}]'
 
+  # test the copying of a script to new instance
+
+  echo "#!/bin/bash" >> testscript.sh
+  echo "echo $(hostname)" >> testscript.sh
+  chmod 755 testscript.sh
+
+  scp -i NW_KeyPair.pem -r ./testscript.sh admin@tektontest.eu-north-1.compute.amazonaws.com:/
+
+  ssh -i NW_KeyPair.pem admin@tektontest.eu-north-1.compute.amazonaws.com '/testscript.sh'
+
 
 
 
