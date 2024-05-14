@@ -75,11 +75,11 @@ apt-get install jq -y
 aws ec2 create-key-pair --key-name NW_Pair --query 'KeyMaterial' --output text > NW_KeyPair.pem
 
 # get vpcid
-VPC_ID=$(aws ec2 describe-vpcs | jq -e ".Vpcs[0].VpcId")
+VPC_ID=$(aws ec2 describe-vpcs | jq -e -r ".Vpcs[0].VpcId")
 
 # get first subnet associated with VPC_ID
 
-SUBNET_ID=$(aws ec2 describe-subnets --filter="Name=vpc-id,Values=${VPC_ID}" |  jq -e ".Subnets[0].SubnetId")
+SUBNET_ID=$(aws ec2 describe-subnets --filter="Name=vpc-id,Values=${VPC_ID}" |  jq -e -r ".Subnets[0].SubnetId")
 
 # hardcode the AMI id for now
 AMI_ID=ami-0506d6d51f1916a96
@@ -93,7 +93,7 @@ aws ec2 create-security-group \
 
 # get the security group id
 
-SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter="Name=group-name,Values=nw-sg" | jq -e ".SecurityGroups[0].GroupId")
+SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filter="Name=group-name,Values=nw-sg" | jq -e -r ".SecurityGroups[0].GroupId")
 
 # launch the instance
 aws ec2 run-instances --image-id ${AMI_ID} --count 1 --instance-type t2.micro --key-name NW_Pair --security-group-ids ${SECURITY_GROUP_ID} --subnet-id ${SUBNET_ID}
