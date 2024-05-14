@@ -136,6 +136,11 @@ aws ec2 run-instances \
   echo "sleeping for 20 secs"
   sleep 20
 
+  # reduce permissions on .pem file
+  chmod 400 NW_KeyPair.pem
+
+  # scp file over to new instance and execute it
+  
   scp  -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:/
 
   ssh -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem admin@${PUBLIC_DNS} '/testscript.sh'
