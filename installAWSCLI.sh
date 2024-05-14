@@ -141,7 +141,7 @@ aws ec2 run-instances \
 
   # scp file over to new instance and execute it
   
-  scp  -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:/
+  scp  -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:~/
 
   ssh -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i NW_KeyPair.pem admin@${PUBLIC_DNS} './testscript.sh'
 
