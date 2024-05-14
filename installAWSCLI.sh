@@ -119,7 +119,7 @@ aws ec2 run-instances \
   # test the copying of a script to new instance
 
   echo "#!/bin/bash" >> testscript.sh
-  echo "echo $(hostname)" >> testscript.sh
+  echo "echo \$(hostname)" >> testscript.sh
   chmod 755 testscript.sh
 
   # install scp
