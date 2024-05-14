@@ -125,9 +125,16 @@ aws ec2 run-instances \
   # install scp
   apt-get install openssh-client -y
 
-  scp -i NW_KeyPair.pem -r ./testscript.sh admin@tektontest.eu-north-1.compute.amazonaws.com:/
+  # get the instanceID
 
-  ssh -i NW_KeyPair.pem admin@tektontest.eu-north-1.compute.amazonaws.com '/testscript.sh'
+  INSTANCE_ID=$(aws ec2 describe-instances --filters Name=tag:Name,Values=tektontest Name=instance-state-name,Values=running | jq -e -r ".Reservations[].Instances[].InstanceId")
+
+  # get the instance PublicDNS
+  PUBLIC_DNS=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[].Instances[].PublicDnsName' | jq -e -r ".[]")
+
+  scp -i NW_KeyPair.pem -r ./testscript.sh admin@${PUBLIC_DNS}:/
+
+  ssh -i NW_KeyPair.pem admin@${PUBLIC_DNS} '/testscript.sh'
 
 
 
