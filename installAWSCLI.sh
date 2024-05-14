@@ -114,7 +114,7 @@ aws ec2 run-instances \
   --key-name NW_Pair \
   --security-group-ids ${SECURITY_GROUP_ID} \
   --subnet-id ${SUBNET_ID} \
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=test01}]'
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=tektontest}]'
 
 
 
