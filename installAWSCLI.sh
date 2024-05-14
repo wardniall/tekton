@@ -69,7 +69,7 @@ apt install groff less -y
 aws ec2 describe-instances
 
 # install jq
-apt-get install jq
+apt-get install jq -y
 
 # create a key pair
 aws ec2 create-key-pair --key-name NW_Pair --query 'KeyMaterial' --output text > NW_KeyPair.pem
