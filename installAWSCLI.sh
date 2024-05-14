@@ -68,7 +68,37 @@ apt install groff less -y
 # list vms
 aws ec2 describe-instances
 
+# install jq
+apt-get install jq
+
+# create a key pair
+aws ec2 create-key-pair --key-name NW_Pair --query 'KeyMaterial' --output text > NW_KeyPair.pem
+
+# get vpcid
+VPC-ID=$(aws ec2 describe-vpcs | jq -e ".Vpcs[0].VpcId")
+
+# get first subnet associated with VPC_ID
+
+SUBNET-ID=$(aws ec2 describe-subnets --filter="Name=vpc-id,Values=${VPC-ID}" |  jq -e ".Subnets[0].SubnetId")
+
+# hardcode the AMI id for now
+AMI-ID=ami-0506d6d51f1916a96
+
+# Create a security group
+aws ec2 create-security-group \
+    --group-name nw-sg \
+    --description "AWS ec2 CLI NW SG" \
+    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=nw-sg}]' \
+    --vpc-id "${VPC-ID}"
+
+# get the security group id
+
+SECURITY-GROUP-ID=$(aws ec2 describe-security-groups --filter="Name=group-name,Values=nw-sg" | jq -e ".SecurityGroups[0].GroupId")
+
+# launch the instance
+aws ec2 run-instances --image-id ${AMI-ID} --count 1 --instance-type t2.micro --key-name NW_Pair --security-group-ids ${SECURITY-GROUP-ID} --subnet-id ${SUBNET-ID}
 
 
-aws ec2 describe-instances
+
+
 
