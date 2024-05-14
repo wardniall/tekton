@@ -74,6 +74,10 @@ apt-get install jq -y
 # create a key pair
 aws ec2 create-key-pair --key-name NW_Pair --query 'KeyMaterial' --output text > NW_KeyPair.pem
 
+echo "****"
+cat NW_KeyPair.pem
+echo "****"
+
 # get vpcid
 VPC_ID=$(aws ec2 describe-vpcs | jq -e -r ".Vpcs[0].VpcId")
 
