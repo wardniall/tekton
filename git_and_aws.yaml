@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name:  git-and-aws
+spec:
+  params:
+  - name: repo-url
+    type: string
+  workspaces:
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url)
+  - name: show-readme
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: show-script
+    workspaces:
+    - name: source
+      workspace: shared-data
