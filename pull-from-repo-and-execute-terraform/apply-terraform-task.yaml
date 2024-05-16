@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: apply-terraform-task
+spec:
+  description: Read and display script.
+  workspaces:
+  - name: source
+  steps:
+  - name: read
+    image: ubuntu 
+    script: | 
+      #!/usr/bin/env  bash
+      cd $(workspaces.source.path) && ls -alt
