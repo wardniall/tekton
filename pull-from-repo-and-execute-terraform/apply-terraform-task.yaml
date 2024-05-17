@@ -4,11 +4,69 @@ metadata:
   name: apply-terraform-task
 spec:
   description: Read and display script.
+  params:
+    - name: config
+      type: string
   workspaces:
-  - name: source
+  - name: team-automation-code
+  - name: performance-team-code 
   steps:
   - name: read
     image: ubuntu 
     script: | 
       #!/usr/bin/env  bash
-      cd $(workspaces.source.path) && ls -alt
+      #
+      #install yq
+      
+      apt update -y
+      apt-get install wget -y
+      apt-get install unzip -y
+
+      #cd $(workspaces.team-automation-code.path) && ls -alt
+
+      wget https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_amd64 -O /usr/local/bin/yq
+      chmod +x /usr/local/bin/yq
+
+      echo "$(params.config)" > params.config
+      hostname=$(yq e '.k3s-vm.name' params.config)
+      no_of_disks=$(yq e '.k3s-vm.num-attach-disk' params.config)
+      profile=$(yq e '.k3s-instana.profile' params.config)
+      
+      echo ${hostname}
+      echo ${no_of_disks}
+      echo ${profile}
+
+
+      # now install terraform
+      
+      wget https://releases.hashicorp.com/terraform/1.8.3/terraform_1.8.3_linux_amd64.zip
+      unzip terraform_1.8.3_linux_amd64.zip
+      mv terraform /usr/local/bin
+      if which terraform >/dev/null 2>&1; then
+       terraform --version
+      else
+        echo "Terraform is not installed"
+      fi
+
+      cd  $(workspaces.team-automation-code.path)/infrastructure-as-code/aws-ec2-k3s
+
+      # replace the names in the terraform variable file
+      
+      sed -i '/name_tag/c\name_tag         = "tektontestvm"' qe-auto-demo.tfvars
+      sed -i '/owner_tag/c\owner_tag        = "Niall Ward"'  qe-auto-demo.tfvars
+      sed -i '/owner_manager_tag/c\owner_manager_tag = "Lara Dourthe"' qe-auto-demo.tfvars
+
+      # append the key name to the qe-auto-demo-tfvars files
+
+      echo "ssh_key_pair = \"perf-test\"" >> qe-auto-demo.tfvars
+      #output the variable file to check
+
+      cat qe-auto-demo.tfvars
+
+      export AWS_ACCESS_KEY_ID=<ACCESS_KEY>
+      export AWS_SECRET_ACCESS_KEY=<SECRETS_ACCESS_KEY>
+
+      terraform init
+      terraform plan -var-file="qe-auto-demo.tfvars"
+      terraform apply -var-file="qe-auto-demo.tfvars" -auto-approve
+

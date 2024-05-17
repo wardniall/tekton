@@ -9,8 +9,20 @@ spec:
     securityContext:
       fsGroup: 65532
   workspaces:
-  - name: shared-data
+  - name: team-automation-code 
     volumeClaimTemplate:
+      metadata:
+        name: team-automation-pvc
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  - name: performance-team-code
+    volumeClaimTemplate:
+      metadata:
+        name: performance-team-pvc
       spec:
         accessModes:
         - ReadWriteOnce
@@ -21,5 +33,45 @@ spec:
     secret:
       secretName: git-credentials
   params:
-  - name: repo-url
+  - name: team-automation-repo-url
     value: git@github.ibm.com:instana/qa-enablement.git
+  - name: performance-team-repo-url
+    value: git@github.ibm.com:instana/perf-automation.git
+  - name: config
+    value: |
+      k3s-vm:
+        name: k3s-jmeterui-test
+        machine-type: e2-standard-16
+        num-attach-disk: 5 #don't change for k3s
+        disk:
+          name:  #don't change disk names
+            - "analytics"
+            - "metrics"
+            - "objects"
+            - "data"
+          type:
+            - "pd-ssd"
+            - "pd-ssd"
+            - "pd-ssd"
+            - "pd-ssd"
+          size:
+            - "1000"
+            - "400"
+            - "400"
+            - "200"
+        firewall-name: allow-ssh-perf-automation-k3s-infra-vm3
+
+      load-vm:
+        name: perf-automation-k3s-loadvm3
+        machine-type: e2-medium
+
+      k3s-instana:
+        profile: demo
+        version: 1.0.0
+
+      ui-testing:
+        testui: true
+        influxdbhost: dashboard.instanaperf.com:8086
+        duration: 2400
+        users: 1
+

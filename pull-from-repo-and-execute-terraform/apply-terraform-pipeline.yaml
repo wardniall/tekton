@@ -4,31 +4,53 @@ metadata:
   name: apply-terraform-pipeline
 spec:
   params:
-  - name: repo-url
+  - name: team-automation-repo-url
+    type: string
+  - name: performance-team-repo-url
+    type: string
+  - name: config
     type: string
   workspaces:
-  - name: shared-data
+  - name:  team-automation-code
     description: | 
-      This workspace contains the cloned repo files, so they can be read by the
-      next task.
+      This workspace contains the cloned team automation repo files
+  - name:  performance-team-code
+    description: | 
+      This workspace contains the cloned performance team  repo files
   - name: git-credentials
     description: My ssh credentials
   tasks:
-  - name: fetch-source
+  - name: clone-team-automation-code
     taskRef:
       name: git-clone
     workspaces:
     - name: output
-      workspace: shared-data
+      workspace: team-automation-code
     - name: ssh-directory
       workspace: git-credentials
     params:
     - name: url
-      value: $(params.repo-url)
+      value: $(params.team-automation-repo-url)
+  - name: clone-performance-team-code
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: performance-team-code
+    - name: ssh-directory
+      workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.performance-team-repo-url)        
   - name: apply-terraform-task
-    runAfter: ["fetch-source"]
+    runAfter: ["clone-team-automation-code","clone-performance-team-code"]
     taskRef:
       name: apply-terraform-task 
     workspaces:
-    - name: source
-      workspace: shared-data
+    - name: team-automation-code 
+      workspace: team-automation-code
+    - name: performance-team-code
+      workspace: performance-team-code
+    params:
+    - name: config
+      value: $(params.config)
